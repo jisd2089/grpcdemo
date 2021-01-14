@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"time"
 
 	"google.golang.org/grpc"
 
@@ -35,7 +36,10 @@ func main() {
 	defer conn.Close()
 	client := pb.NewGreeterClient(conn)
 
-	resp, err := client.Greet(context.TODO(), &pb.Request{Name: "zhangsan"})
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Duration(2 * time.Second)))
+	defer cancel()
+
+	resp, err := client.Greet(ctx, &pb.Request{Name: "zhangsan"})
 	if err != nil {
 		fmt.Println("Greet err", err)
 	} else {

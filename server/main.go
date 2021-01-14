@@ -4,8 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 	"net"
+	"time"
 
 	"google.golang.org/grpc"
 	"grpcdemo/pb"
@@ -38,6 +41,14 @@ func main() {
 }
 
 func (server *GreetServer) Greet(ctx context.Context, in *pb.Request) (*pb.Response, error) {
+
+	time.Sleep(time.Second*3)
+
+	if ctx.Err() == context.DeadlineExceeded {
+		fmt.Println("context.DeadlineExceeded")
+		return nil, status.Errorf(codes.Canceled, "GreetServer.Greet canceled")
+	}
+
 	fmt.Println("GreetServer Greet...", in.Name)
 	return &pb.Response{Greet: "lisi"}, nil
 }
